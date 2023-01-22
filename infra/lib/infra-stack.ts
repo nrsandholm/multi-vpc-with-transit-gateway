@@ -1,5 +1,6 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
-import { AllocateCidrRequest, CfnTransitGateway, CfnTransitGatewayAttachment, IpAddresses, ISubnet, Subnet, SubnetIpamOptions, SubnetType, Vpc, VpcIpamOptions } from 'aws-cdk-lib/aws-ec2';
+import { ResourceType } from 'aws-cdk-lib/aws-config';
+import { AllocateCidrRequest, CfnTransitGateway, CfnTransitGatewayAttachment, FlowLog, FlowLogDestination, FlowLogResourceType, IpAddresses, ISubnet, Subnet, SubnetIpamOptions, SubnetType, Vpc, VpcIpamOptions } from 'aws-cdk-lib/aws-ec2';
 import { Construct } from 'constructs';
 
 export class InfraStack extends Stack {
@@ -79,6 +80,11 @@ export class InfraStack extends Stack {
       vpcId: vpcB.vpcId,
       subnetIds: vpcB.publicSubnets.map((subnet: ISubnet) => subnet.subnetId),
       transitGatewayId: transitGateway.attrId,
+    });
+
+    new FlowLog(this, 'TransitGatewayFlowLog', {
+      resourceType: FlowLogResourceType.fromNetworkInterfaceId(transitGateway.attrId),
+      destination: FlowLogDestination.toCloudWatchLogs()
     });
   }
 }

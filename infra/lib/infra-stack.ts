@@ -1,5 +1,5 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
-import { AllocateCidrRequest, IpAddresses, SubnetIpamOptions, SubnetType, Vpc, VpcIpamOptions } from 'aws-cdk-lib/aws-ec2';
+import { AllocateCidrRequest, CfnTransitGateway, CfnTransitGatewayAttachment, IpAddresses, ISubnet, Subnet, SubnetIpamOptions, SubnetType, Vpc, VpcIpamOptions } from 'aws-cdk-lib/aws-ec2';
 import { Construct } from 'constructs';
 
 export class InfraStack extends Stack {
@@ -60,6 +60,25 @@ export class InfraStack extends Stack {
         name: 'PublicSubnetB',
         subnetType: SubnetType.PUBLIC,
       }]
+    });
+
+    const transitGateway = new CfnTransitGateway(this, 'TransitGateway', {
+      transitGatewayCidrBlocks: [
+        vpcA.vpcCidrBlock,
+        vpcB.vpcCidrBlock,
+      ],
+    });
+
+    new CfnTransitGatewayAttachment(this, 'TransitGatewayAttachmentVpcA', {
+      vpcId: vpcA.vpcId,
+      subnetIds: vpcA.publicSubnets.map((subnet: ISubnet) => subnet.subnetId),
+      transitGatewayId: transitGateway.attrId,
+    });
+
+    new CfnTransitGatewayAttachment(this, 'TransitGatewayAttachmentVpcB', {
+      vpcId: vpcB.vpcId,
+      subnetIds: vpcB.publicSubnets.map((subnet: ISubnet) => subnet.subnetId),
+      transitGatewayId: transitGateway.attrId,
     });
   }
 }

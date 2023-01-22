@@ -1,9 +1,11 @@
 const dgram = require('dgram');
+const http = require('http');
 
 const server = dgram.createSocket('udp4');
 const client = dgram.createSocket('udp4');
 
 const serverPort = parseInt(process.env.SERVER_PORT, 10);
+const httpServerPort = parseInt(process.env.HTTP_SERVER_PORT, 10);
 const targetHost = process.env.TARGET_HOST;
 const targetPort = parseInt(process.env.TARGET_PORT, 10);
 const initialDelay = parseInt(process.env.INIT_DELAY, 10) || 0;
@@ -39,3 +41,13 @@ const greeting = setTimeout(() => {
     }
   });
 }, initialDelay);
+
+const httpServer = http.createServer((req, res) => {
+  console.log('someone done a health check');
+  res.writeHead(200);
+  res.end();
+});
+
+httpServer.listen(httpServerPort, () => {
+    console.log(`health check server running on ${httpServerPort}`);
+});

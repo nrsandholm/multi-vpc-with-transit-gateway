@@ -82,9 +82,15 @@ export class InfraStack extends Stack {
       transitGatewayId: transitGateway.attrId,
     });
 
-    new FlowLog(this, 'TransitGatewayFlowLog', {
-      resourceType: FlowLogResourceType.fromNetworkInterfaceId(transitGateway.attrId),
+    new FlowLog(this, 'VpcAFlowLog', {
+      resourceType: FlowLogResourceType.fromVpc(vpcA),
       destination: FlowLogDestination.toCloudWatchLogs()
     });
+
+    new FlowLog(this, 'VpcBFlowLog', {
+      resourceType: FlowLogResourceType.fromVpc(vpcB),
+      destination: FlowLogDestination.toCloudWatchLogs()
+    });
+
   }
 }

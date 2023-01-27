@@ -4,6 +4,9 @@ import { AllocateCidrRequest, CfnTransitGateway, CfnTransitGatewayAttachment, Fl
 import { Construct } from 'constructs';
 
 export class InfraStack extends Stack {
+  public readonly vpcA: Vpc;
+  public readonly vpcB: Vpc;
+
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
@@ -92,5 +95,7 @@ export class InfraStack extends Stack {
       destination: FlowLogDestination.toCloudWatchLogs()
     });
 
+    this.vpcA = vpcA;
+    this.vpcB = vpcB;
   }
 }
